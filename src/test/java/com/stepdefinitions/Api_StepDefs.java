@@ -20,6 +20,7 @@ public class Api_StepDefs
     public void theBaseUriIsSetTo(String uri) 
     {
         this.baseUri = uri;
+        
         RestAssured.baseURI = uri;
     }
 
@@ -35,6 +36,7 @@ public class Api_StepDefs
     public void theResponseStatusCodeShouldBe(int expectedStatusCode) 
     {
         int actualStatusCode = response.getStatusCode();
+        
         Assertions.assertEquals(
             expectedStatusCode, 
             actualStatusCode, 
@@ -46,6 +48,7 @@ public class Api_StepDefs
     public void theResponseBodyShouldContain(String key) 
     {
         boolean hasKey = response.jsonPath().get(key) != null;
+        
         Assertions.assertTrue(
             hasKey, 
             "The response body does not contain the key: " + key
