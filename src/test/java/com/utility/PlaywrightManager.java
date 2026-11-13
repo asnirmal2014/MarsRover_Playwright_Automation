@@ -5,6 +5,8 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import java.util.Arrays;
+import java.util.List;
 
 public class PlaywrightManager 
 {
@@ -17,34 +19,41 @@ public class PlaywrightManager
     private static final ThreadLocal<Page> page = new ThreadLocal<>();
 
     public static Page getPage() 
-	{
+    {
         // Initialize global Playwright and Browser only once (Double-checked locking)
         if (playwright == null) 
-		{
+        {
             synchronized (PlaywrightManager.class) 
-			{
+            {
                 if (playwright == null) 
-				{
+                {
                     playwright = Playwright.create();
                     
                     String browserChannel = ConfigReader.get("browser.name", "chrome");
-                    int slowMoValue = Integer.parseInt(ConfigReader.get("playwright.slowmo", "0")); // 0 for parallel speed
+                    int slowMoValue = Integer.parseInt(ConfigReader.get("playwright.slowmo", "0")); 
                     boolean isHeadless = Boolean.parseBoolean(ConfigReader.get("playwright.headless", "true"));
+                    
+                    // Define arguments to maximize the browser window
+                    List<String> args = Arrays.asList("--start-maximized");
                     
                     browser = playwright.chromium().launch(
                         new BrowserType.LaunchOptions()
                             .setChannel(browserChannel)
                             .setSlowMo(slowMoValue)
                             .setHeadless(isHeadless)
+                            .setArgs(args) // <-- ADD THIS to maximize the window
                     );
                 }
             }
         }
 
-        // Initialize Thread-Local Context and Page for this specific test thread
-        if (page.get() == null) 
-		{
-            BrowserContext newContext = browser.newContext();
+        // 2. Initialize Thread-Local Context and Page for THIS specific test thread
+        if (page.get() == null) {
+            // Set viewport to null so the context takes the full size of the maximized window
+            BrowserContext newContext = browser.newContext(
+                new Browser.NewContextOptions().setViewportSize(null) // <-- ADD THIS
+            );
+            
             context.set(newContext);
             page.set(newContext.newPage());
         }
@@ -52,37 +61,28 @@ public class PlaywrightManager
         return page.get();
     }
 
-    public static void closeBrowser() 
-	{
+    public static void closeBrowser() {
         // Close ONLY the resources belonging to the current thread
-        if (page.get() != null) 
-		{
+        if (page.get() != null) {
             page.get().close();
             page.remove(); // Clean up ThreadLocal to prevent memory leaks
         }
-        
-		if (context.get() != null) 
-		{
+        if (context.get() != null) {
             context.get().close();
             context.remove();
         }
     }
 
-    public static void closePlaywright() 
-	{
+    public static void closePlaywright() {
         // Shut down global resources at the very end of the suite
-        if (browser != null) 
-		{
+        if (browser != null) {
             browser.close();
             browser = null;
         }
-        
-		if (playwright != null) 
-		{
+        if (playwright != null) {
             playwright.close();
             playwright = null;
         }
-        
-		System.out.println("Playwright shut down cleanly.");
+        System.out.println("✅ Playwright shut down cleanly.");
     }
 }
