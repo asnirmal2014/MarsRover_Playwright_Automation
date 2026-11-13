@@ -48,7 +48,8 @@ public class PlaywrightManager
         }
 
         // 2. Initialize Thread-Local Context and Page for THIS specific test thread
-        if (page.get() == null) {
+        if (page.get() == null) 
+        {
             // Set viewport to null so the context takes the full size of the maximized window
             BrowserContext newContext = browser.newContext(
                 new Browser.NewContextOptions().setViewportSize(null) // <-- ADD THIS
@@ -61,28 +62,37 @@ public class PlaywrightManager
         return page.get();
     }
 
-    public static void closeBrowser() {
+    public static void closeBrowser() 
+    {
         // Close ONLY the resources belonging to the current thread
-        if (page.get() != null) {
+        if (page.get() != null) 
+        {
             page.get().close();
             page.remove(); // Clean up ThreadLocal to prevent memory leaks
         }
-        if (context.get() != null) {
+        
+        if (context.get() != null) 
+        {
             context.get().close();
             context.remove();
         }
     }
 
-    public static void closePlaywright() {
+    public static void closePlaywright() 
+    {
         // Shut down global resources at the very end of the suite
-        if (browser != null) {
+        if (browser != null) 
+        {
             browser.close();
             browser = null;
         }
-        if (playwright != null) {
+    
+        if (playwright != null) 
+        {
             playwright.close();
             playwright = null;
         }
-        System.out.println("✅ Playwright shut down cleanly.");
+        
+        System.out.println("Playwright shut down cleanly.");
     }
 }
