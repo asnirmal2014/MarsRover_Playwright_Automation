@@ -5,97 +5,84 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
-import java.util.Arrays;
 
-/*
-PlaywrightManager manages the Playwright browser lifecycle.
-Browser, BrowserContext and Page are created only when required.
-BrowserContext acts like a fresh Incognito/Private window.
-*/
 public class PlaywrightManager 
 {
-    private static Playwright playwright = null;
-    private static Browser browser = null;
-    private static BrowserContext context = null;
-    private static Page page = null;
+    // Global instances (shared across all threads to save memory and startup time)
+    private static Playwright playwright;
+    private static Browser browser;
+    
+    // ThreadLocal instances (each parallel test thread gets its own isolated copy)
+    private static final ThreadLocal<BrowserContext> context = new ThreadLocal<>();
+    private static final ThreadLocal<Page> page = new ThreadLocal<>();
 
-    /*
-    Lazy initialization for Playwright Page.
-    */
     public static Page getPage() 
-    {
-        if (page == null) 
-        {
-            playwright = Playwright.create();
-            
-            // Read browser channel and slowMo from config.properties
-            String browserChannel = ConfigReader.get("browser.name", "chrome");
-            int slowMoValue = Integer.parseInt(ConfigReader.get("playwright.slowmo", "1000"));
-            boolean isHeadless = Boolean.parseBoolean(ConfigReader.get("playwright.headless", "false"));
-            
-            // Launch browser using the configured channel and options
-            browser = playwright.chromium().launch(
-                new BrowserType.LaunchOptions()
-                    .setChannel(browserChannel)
-                    .setSlowMo(slowMoValue)
-                    .setHeadless(isHeadless)
-                    .setArgs(Arrays.asList("--start-maximized"))
-            );
-            
-            // Create a new Browser Context (acts like a fresh Incognito/Private window)
-            // context = browser.newContext();
-            
-            // Create a new Browser Context with null viewport to respect the maximized state
-            context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
-            
-            /* Since your code explicitly uses playwright.chromium(), the --start-maximized flag is perfectly safe and will work for Chrome, Edge, and standard Chromium channels. */
-            
-            // Creates a new page in the browser context (a tab in the browser)
-            page = context.newPage();
+	{
+        // Initialize global Playwright and Browser only once (Double-checked locking)
+        if (playwright == null) 
+		{
+            synchronized (PlaywrightManager.class) 
+			{
+                if (playwright == null) 
+				{
+                    playwright = Playwright.create();
+                    
+                    String browserChannel = ConfigReader.get("browser.name", "chrome");
+                    int slowMoValue = Integer.parseInt(ConfigReader.get("playwright.slowmo", "0")); // 0 for parallel speed
+                    boolean isHeadless = Boolean.parseBoolean(ConfigReader.get("playwright.headless", "true"));
+                    
+                    browser = playwright.chromium().launch(
+                        new BrowserType.LaunchOptions()
+                            .setChannel(browserChannel)
+                            .setSlowMo(slowMoValue)
+                            .setHeadless(isHeadless)
+                    );
+                }
+            }
         }
-        return page;
-    }
 
-    /*
-    Closes the current page and context after each scenario.
-    Keeps the browser and playwright instance alive for faster subsequent test starts.
-    */
-    public static void closeBrowser() 
-    {
-        if (page != null) 
-        {
-            page.close();
-            page = null;
+        // Initialize Thread-Local Context and Page for this specific test thread
+        if (page.get() == null) 
+		{
+            BrowserContext newContext = browser.newContext();
+            context.set(newContext);
+            page.set(newContext.newPage());
         }
         
-        if (context != null) 
-        {
-            context.close();
-            context = null;
-        }
-        // Note: We intentionally do NOT close the browser or playwright instance here.
-        // This allows the next UI scenario to start much faster by reusing the launched browser.
+        return page.get();
     }
 
-    /*
-    Completely shuts down the Browser and Playwright Node.js driver.
-    This should be called exactly once at the end of the entire test suite 
-    (e.g., in an @AfterAll hook) to prevent Node.js temp file cleanup warnings.
-    */
+    public static void closeBrowser() 
+	{
+        // Close ONLY the resources belonging to the current thread
+        if (page.get() != null) 
+		{
+            page.get().close();
+            page.remove(); // Clean up ThreadLocal to prevent memory leaks
+        }
+        
+		if (context.get() != null) 
+		{
+            context.get().close();
+            context.remove();
+        }
+    }
+
     public static void closePlaywright() 
-    {
+	{
+        // Shut down global resources at the very end of the suite
         if (browser != null) 
-        {
+		{
             browser.close();
             browser = null;
         }
         
-        if (playwright != null) 
-        {
+		if (playwright != null) 
+		{
             playwright.close();
             playwright = null;
         }
         
-        System.out.println("Playwright shut down cleanly.");
+		System.out.println("Playwright shut down cleanly.");
     }
 }

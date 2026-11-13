@@ -215,9 +215,24 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.3.0</version>
-                </plugin>
+			    	<artifactId>maven-surefire-plugin</artifactId>
+			    	<version>3.3.0</version>
+			    	<configuration>
+			        	<!-- Run test classes/methods in parallel -->
+			        	<parallel>methods</parallel>
+			        	<!-- Use 4 threads (adjust based on your CPU cores, e.g., 4, 8, or 'useUnlimitedThreads') -->
+			        	<threadCount>4</threadCount>
+			        		<properties>
+			            		<configurationParameters>
+			                	cucumber.junit-platform.naming-strategy=long
+			                	<!-- Optional: Enable Cucumber's native parallel execution if needed -->
+			                	cucumber.execution.parallel.enabled=true
+			                	cucumber.execution.parallel.config.strategy=fixed
+			                	cucumber.execution.parallel.config.fixed.parallelism=4
+			            		</configurationParameters>
+			        		</properties>
+			    	</configuration>
+				</plugin>
             </plugins>
         </pluginManagement>
 
