@@ -5,6 +5,7 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import java.util.Arrays;
 
 /*
 PlaywrightManager manages the Playwright browser lifecycle.
@@ -38,10 +39,16 @@ public class PlaywrightManager
                     .setChannel(browserChannel)
                     .setSlowMo(slowMoValue)
                     .setHeadless(isHeadless)
+                    .setArgs(Arrays.asList("--start-maximized"))
             );
             
             // Create a new Browser Context (acts like a fresh Incognito/Private window)
-            context = browser.newContext();
+            // context = browser.newContext();
+            
+            // Create a new Browser Context with null viewport to respect the maximized state
+            context = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
+            
+            /* Since your code explicitly uses playwright.chromium(), the --start-maximized flag is perfectly safe and will work for Chrome, Edge, and standard Chromium channels. */
             
             // Creates a new page in the browser context (a tab in the browser)
             page = context.newPage();
