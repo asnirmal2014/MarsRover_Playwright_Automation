@@ -41,7 +41,7 @@ public class PlaywrightManager
                             .setChannel(browserChannel)
                             .setSlowMo(slowMoValue)
                             .setHeadless(isHeadless)
-                            .setArgs(args) // <-- ADD THIS to maximize the window
+                            .setArgs(args) // <-- ADD this to maximize the window
                     );
                 }
             }
