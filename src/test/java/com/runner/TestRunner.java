@@ -10,7 +10,7 @@ import org.junit.platform.suite.api.Suite;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/1_RoverMovement.feature")
 @SelectClasspathResource("features/2_MultipleRovers.feature")
-@SelectClasspathResource("features/3_ApiTesting.feature")
+@SelectClasspathResource("features/3_MarsWeatherAPI.feature")
 @ConfigurationParameter(key = Constants.GLUE_PROPERTY_NAME, value = "com.stepdefinitions, com.utility")
 @ConfigurationParameter(key = Constants.PLUGIN_PUBLISH_QUIET_PROPERTY_NAME, value = "true")
 @ConfigurationParameter(key = Constants.PLUGIN_PROPERTY_NAME, value = "pretty, html:target/cucumber/report.html, json:target/cucumber/report.json")

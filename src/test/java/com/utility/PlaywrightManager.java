@@ -19,8 +19,8 @@ public class PlaywrightManager
     private static Page page = null;
 
     /*
-     * Lazy initialization for Playwright Page.
-     */
+    Lazy initialization for Playwright Page.
+    */
     public static Page getPage() 
     {
         if (page == null) 
@@ -49,21 +49,46 @@ public class PlaywrightManager
         return page;
     }
 
+    /*
+    Closes the current page and context after each scenario.
+    Keeps the browser and playwright instance alive for faster subsequent test starts.
+    */
     public static void closeBrowser() 
     {
+        if (page != null) 
+        {
+            page.close();
+            page = null;
+        }
+        
         if (context != null) 
         {
             context.close();
+            context = null;
         }
+        // Note: We intentionally do NOT close the browser or playwright instance here.
+        // This allows the next UI scenario to start much faster by reusing the launched browser.
+    }
+
+    /*
+    Completely shuts down the Browser and Playwright Node.js driver.
+    This should be called exactly once at the end of the entire test suite 
+    (e.g., in an @AfterAll hook) to prevent Node.js temp file cleanup warnings.
+    */
+    public static void closePlaywright() 
+    {
         if (browser != null) 
         {
             browser.close();
+            browser = null;
         }
+        
         if (playwright != null) 
         {
             playwright.close();
+            playwright = null;
         }
-        page = null;
-        context = null;
+        
+        System.out.println("Playwright shut down cleanly.");
     }
 }

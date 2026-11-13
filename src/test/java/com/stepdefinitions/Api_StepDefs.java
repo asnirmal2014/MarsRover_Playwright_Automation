@@ -1,57 +1,46 @@
 package com.stepdefinitions;
 
-import org.junit.jupiter.api.Assertions;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.And;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
-/*
-Only method calling happens in the Step Definition file.
-Method definitions and Rest Assured operations happen here.
-*/
+/**
+ * Reusable API step definitions shared across all API feature files.
+ * Uses Rest Assured for lightweight, standalone HTTP testing.
+ */
 public class Api_StepDefs 
 {
-    private String baseUri = null;
-    private Response response = null;
+    private RequestSpecification request;
+    private Response response;
 
     @Given("the base URI is set to {string}")
-    public void theBaseUriIsSetTo(String uri) 
+    public void the_base_uri_is_set_to(String baseUri) 
     {
-        this.baseUri = uri;
-        
-        RestAssured.baseURI = uri;
+        this.request = RestAssured.given().baseUri(baseUri);
     }
 
     @When("I send a GET request to {string}")
-    public void iSendAGetRequestTo(String endpoint) 
+    public void i_send_a_get_request_to(String endpoint) 
     {
-        response = RestAssured.given()
-                              .when()
-                              .get(endpoint);
+        this.response = request.when().get(endpoint);
     }
 
     @Then("the response status code should be {int}")
-    public void theResponseStatusCodeShouldBe(int expectedStatusCode) 
+    public void the_response_status_code_should_be(int expectedStatusCode) 
     {
-        int actualStatusCode = response.getStatusCode();
-        
-        Assertions.assertEquals(
-            expectedStatusCode, 
-            actualStatusCode, 
-            "The API status code is incorrect!"
-        );
+        response.then().assertThat().statusCode(equalTo(expectedStatusCode));
     }
 
-    @Then("the response body should contain {string}")
-    public void theResponseBodyShouldContain(String key) 
+    @And("the response body should contain {string}")
+    public void the_response_body_should_contain(String expectedText) 
     {
-        boolean hasKey = response.jsonPath().get(key) != null;
-        
-        Assertions.assertTrue(
-            hasKey, 
-            "The response body does not contain the key: " + key
-        );
+        response.then().assertThat().body(containsString(expectedText));
+        response.prettyPrint(); // Prints formatted JSON for easy debugging
     }
 }
