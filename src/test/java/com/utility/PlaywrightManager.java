@@ -41,7 +41,7 @@ public class PlaywrightManager
                             .setChannel(browserChannel)
                             .setSlowMo(slowMoValue)
                             .setHeadless(isHeadless)
-                            .setArgs(args) // <-- ADD this to maximize the window
+                            .setArgs(args) // <-- Add this to maximize the window
                     );
                 }
             }
@@ -51,11 +51,10 @@ public class PlaywrightManager
         if (page.get() == null) 
         {
             // Set viewport to null so the context takes the full size of the maximized window
-            BrowserContext newContext = browser.newContext(
-                new Browser.NewContextOptions().setViewportSize(null) // <-- ADD THIS
-            );
+            BrowserContext newContext = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
             
             context.set(newContext);
+            
             page.set(newContext.newPage());
         }
         
