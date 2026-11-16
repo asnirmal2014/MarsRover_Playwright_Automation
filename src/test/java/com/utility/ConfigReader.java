@@ -23,6 +23,7 @@ public class ConfigReader
         try 
         {
             InputStream inputStream = ConfigReader.class.getClassLoader().getResourceAsStream("config.properties");
+            
             if (inputStream != null) 
             {
                 properties.load(inputStream);
