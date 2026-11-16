@@ -1,5 +1,6 @@
 package com.utility;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -44,6 +45,7 @@ public class ConfigReader
     }
     
     /**
+     * Convenience: key only (backward compatible)
      * Gets a configuration value with no default (returns empty string if not found).
      * This is a convenience method for backward compatibility.
      */
@@ -78,5 +80,38 @@ public class ConfigReader
         
         // Return hardcoded default
         return defaultValue;
+    }
+    
+    /**
+     * Resolves a UI base URL.
+     * - If the value is already a full URL (http/https/file), use it as-is
+     *   (this lets CI override with -Dui.base.url=https://... if needed).
+     * - Otherwise treat it as a RELATIVE path and resolve it against the
+     *   project root, producing a correct file:// URL on BOTH Windows and Linux.
+     */
+    public static String getResolvedFileUrl(String key, String defaultRelative) 
+    {
+        String value = get(key, defaultRelative);
+
+        if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("file://")) 
+        {
+            return value;
+        }
+
+        String base = System.getProperty("project.basedir");
+        
+        if (base == null || base.isEmpty()) 
+        {
+            base = System.getProperty("user.dir");
+        }
+
+        String abs = new File(base, value).getAbsolutePath().replace('\\', '/');
+        
+        if (!abs.startsWith("/")) 
+        {
+            abs = "/" + abs;
+        }
+        
+        return "file://" + abs; // -> file:///D:/... on Windows, file:///home/... on Linux
     }
 }

@@ -32,7 +32,8 @@ public class MarsRover_StepDefs
     @Given("the Mars Rover web application is open")
     public void theMarsRoverWebApplicationIsOpen() 
     {
-        marsRoverPage().openApplication(ConfigReader.get("ui.base.url"));
+        // marsRoverPage().openApplication(ConfigReader.get("ui.base.url"));
+        marsRoverPage().openApplication(ConfigReader.getResolvedFileUrl("ui.base.url", "index.html"));
     }
 
     @Given("the plateau size is set to {string}")
