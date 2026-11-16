@@ -4,67 +4,79 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/*
-ConfigReader loads configuration from config.properties file.
-Provides static methods to read property values by key.
-Properties are loaded only once when the class is first accessed.
-*/
 public class ConfigReader 
 {
-    private static Properties properties = null;
+    private static final Properties props = new Properties();
 
-    /*
-     * Static block ensures properties are loaded only once at class initialization.
-     */
+    // Static block to load the properties file once when the class is loaded
     static 
     {
-        properties = new Properties();
-        
+        InputStream in = null;
+    
         try 
         {
-            InputStream inputStream = ConfigReader.class.getClassLoader().getResourceAsStream("config.properties");
-            
-            if (inputStream != null) 
+            in = ConfigReader.class.getClassLoader().getResourceAsStream("config.properties");
+        
+            if (in != null) 
             {
-                properties.load(inputStream);
-                inputStream.close();
-            } 
-            else 
-            {
-                throw new RuntimeException("config.properties file not found in classpath");
+                props.load(in);
             }
         } 
         catch (IOException e) 
         {
-            throw new RuntimeException("Failed to load config.properties", e);
+            System.err.println("Could not load config.properties: " + e.getMessage());
+        } 
+        finally 
+        {
+            // Standard practice to close the stream when not using try-with-resources
+            if (in != null) 
+            {
+                try 
+                {
+                    in.close();
+                } 
+                catch (IOException e) 
+                {
+                    System.err.println("Could not close config.properties stream: " + e.getMessage());
+                }
+            }
         }
     }
-
-    /*
-     * Returns the property value for the given key.
-     * @param key The property key to look up
-     * @return The property value as a String
-     * @throws RuntimeException if the key is not found
+    
+    /**
+     * Gets a configuration value with no default (returns empty string if not found).
+     * This is a convenience method for backward compatibility.
      */
     public static String get(String key) 
     {
-        String value = properties.getProperty(key);
-        
-        if (value == null) 
-        {
-            throw new RuntimeException("Property '" + key + "' not found in config.properties");
-        }
-        return value.trim();
+        return get(key, ""); 
     }
 
-    /*
-     * Returns the property value for the given key, or a default value if not found.
-     * @param key The property key to look up
-     * @param defaultValue The value to return if key is not found
-     * @return The property value as a String, or defaultValue if not found
+    /**
+     * Gets a configuration value.
+     * Priority: 1. System Property (e.g., from Maven -D flag) 
+     *           2. config.properties file 
+     *           3. Hardcoded default value
      */
     public static String get(String key, String defaultValue) 
     {
-        return properties.getProperty(key, defaultValue).trim();
+        // Check command-line / CI override first
+        String sys = System.getProperty(key);
+        
+        if (sys != null && !sys.isEmpty()) 
+        {
+            return sys;
+        }
+        
+        // Check config.properties file
+        String file = props.getProperty(key);
+        
+        if (file != null && !file.isEmpty()) 
+        {
+            return file;
+        }
+        
+        // Return hardcoded default
+        return defaultValue;
     }
 }

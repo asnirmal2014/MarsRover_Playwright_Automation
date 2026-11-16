@@ -18,6 +18,10 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.release>21</maven.compiler.release>
         
+        <browser.name>chrome</browser.name>
+        <playwright.slowmo>1000</playwright.slowmo>
+        <playwright.headless>false</playwright.headless> <!-- Default for local -->
+        
         <!-- Centralized Version Properties -->
         <!--<cucumber.version>7.34.2</cucumber.version>-->
         <cucumber.version>7.20.1</cucumber.version> <!-- Corrected to the latest stable Cucumber version -->
@@ -222,6 +226,14 @@
 			        	<parallel>methods</parallel>
 			        	<!-- Use 4 threads (adjust based on your CPU cores, e.g., 4, 8, or 'useUnlimitedThreads') -->
 			        	<threadCount>4</threadCount>
+			        		
+	                    <!-- THIS IS THE CRUCIAL ADDITION: Forward -D flags to the test JVM -->
+	                    <systemPropertyVariables>
+	                        <playwright.headless>${playwright.headless}</playwright.headless>
+	                        <browser.name>${browser.name}</browser.name>
+	                        <playwright.slowmo>${playwright.slowmo}</playwright.slowmo>
+	                    </systemPropertyVariables>
+                    
 			        		<properties>
 			            		<configurationParameters>
 			                	cucumber.junit-platform.naming-strategy=long
