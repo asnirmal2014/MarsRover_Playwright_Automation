@@ -23,7 +23,10 @@ public class PlaywrightManager
         // Initialize global Playwright and Browser only once (Double-checked locking)
         if (playwright == null) 
         {
-            synchronized (PlaywrightManager.class) 
+            // The synchronized keyword in Java is a thread-safety modifier that ensures only one thread can execute a specific method or block of code at a time. 
+        	// The synchronized keyword in Java prevents race conditions and memory consistency errors when multiple threads access shared data simultaneously.
+        	// The synchronized block
+        	synchronized (PlaywrightManager.class)   
             {
                 if (playwright == null) 
                 {
@@ -47,7 +50,7 @@ public class PlaywrightManager
             }
         }
 
-        // 2. Initialize Thread-Local Context and Page for THIS specific test thread
+        // Initialize Thread-Local Context and Page for THIS specific test thread
         if (page.get() == null) 
         {
             // Set viewport to null so the context takes the full size of the maximized window
