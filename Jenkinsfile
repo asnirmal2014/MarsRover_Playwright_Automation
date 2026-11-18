@@ -73,14 +73,12 @@ pipeline
             echo 'Pipeline failed. Check the console output and archived reports.'
         }
     }
-}
-	
+}	
 /*
 Legitimate uses of script { }:
 ------------------------------
 Use the script { } block inside a Declarative Jenkins Pipeline whenever you need to run Scripted Pipeline (Groovy) logic that the standard Declarative syntax does not support.
 Declarative Pipelines are meant to be simple and structured, so they intentionally restrict complex programming constructs. Adding a script block inside a steps section acts as an "escape hatch" for advanced logic.
-
 	
 Legitimate uses of `script { }' block inside a Declarative Jenkins Pipeline:
 
@@ -153,7 +151,7 @@ steps
         
 		for (b in browsers) 
 		{
-            bat "mvn exec:java -D exec.args=\"install ${b}\""
+            bat "mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args=\"install ${b}\""
         }
     }
 }
@@ -168,10 +166,10 @@ steps
 {
     script 
 	{
-        def failed = bat(returnStdout: true, script: 'type failures.txt').trim()failed.split('\n')
-		.each { line ->
-            echo "FAILED: ${line}"
-        }
+        def failed = bat(returnStdout: true, script: 'type failures.txt').trim()
+		failed.split('\n').each { line ->
+		echo "FAILED: ${line}"
+		}
     }
 }
 ```
@@ -218,9 +216,13 @@ steps
     script 
 	{
         currentBuild.description = "Branch: ${env.BRANCH_NAME}"
-        currentBuild.result = 'SUCCESS'
+		
+        // Do not set currentBuild.result = 'SUCCESS' — success is the default.
+        // Only set it when you need to downgrade the build:
+        
+		// currentBuild.result = 'UNSTABLE'
+        // currentBuild.result = 'FAILURE'
     }
 }
 ```
-*/	
-
+*/
