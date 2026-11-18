@@ -75,4 +75,5 @@ pipeline
     }
     
     // Use the script { } block inside a Declarative Jenkins Pipeline whenever you need to run Scripted Pipeline (Groovy) logic that the standard Declarative syntax does not support.
+    // Declarative Pipelines are meant to be simple and structured, so they intentionally restrict complex programming constructs. Adding a script block inside a steps section acts as an "escape hatch" for advanced logic.
 }
