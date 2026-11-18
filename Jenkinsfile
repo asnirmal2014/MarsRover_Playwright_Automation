@@ -12,10 +12,10 @@ pipeline
     }
 
     // Optional: If your Jenkins agent has Node.js configured, uncomment the line below.
-    // tools 
-	// {
-    //     nodejs 'node-20' 
-    // }
+    tools 
+	{
+         nodejs 'node-24' 
+    }
 
     stages 
     {
