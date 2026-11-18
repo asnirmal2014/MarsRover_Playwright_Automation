@@ -1,6 +1,9 @@
 pipeline 
 {
-    agent any
+    agent 
+	{ 
+		label 'windows' 
+	}
 
     tools 
 	{
@@ -26,8 +29,8 @@ pipeline
 		{
             steps 
 			{
-				// cleanWs()   // Optional: Only add if you're debugging. Wipes workspace and the browser cache
-                echo 'Checking out latest code from Git repository'
+                // cleanWs()   // Optional: Only add if you're debugging. Wipes workspace and the browser cache
+				echo 'Checking out latest code from Git repository'
                 checkout scm
             }
         }
