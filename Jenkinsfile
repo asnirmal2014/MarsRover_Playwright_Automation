@@ -73,4 +73,6 @@ pipeline
             echo 'Pipeline failed. Check the console output and archived reports.'
         }
     }
+    
+    // Use the script { } block inside a Declarative Jenkins Pipeline whenever you need to run Scripted Pipeline (Groovy) logic that the standard Declarative syntax does not support.
 }
