@@ -73,6 +73,7 @@ pipeline
             echo 'Pipeline failed. Check the console output and archived reports.'
         }
     }
+}
 	
 /*
 Legitimate uses of script { }:
@@ -222,5 +223,4 @@ steps
 }
 ```
 */	
-	
-}
+
