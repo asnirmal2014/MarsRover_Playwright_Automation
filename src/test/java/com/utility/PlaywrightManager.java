@@ -23,41 +23,49 @@ public class PlaywrightManager
         // Initialize global Playwright and Browser only once (Double-checked locking)
         if (playwright == null) 
         {
-            // The synchronized keyword in Java is a thread-safety modifier that ensures only one thread can execute a specific method or block of code at a time. 
+			// The synchronized keyword in Java is a thread-safety modifier that ensures only one thread can execute a specific method or block of code at a time. 
         	// The synchronized keyword in Java prevents race conditions and memory consistency errors when multiple threads access shared data simultaneously.
         	// The synchronized block
-        	synchronized (PlaywrightManager.class)   
+            synchronized (PlaywrightManager.class)   
             {
                 if (playwright == null) 
                 {
                     playwright = Playwright.create();
                     
-                    String browserChannel = ConfigReader.get("browser.name", "chrome");
+                    // Default to empty string to use Playwright's bundled Chromium.
+                    // If you want to use a specific browser (e.g., "chrome", "msedge") locally, 
+                    // set browser.name=chrome in your config file AND ensure it's installed on that machine.
+                    String browserChannel = ConfigReader.get("browser.name", "").trim();
                     int slowMoValue = Integer.parseInt(ConfigReader.get("playwright.slowmo", "0")); 
                     boolean isHeadless = Boolean.parseBoolean(ConfigReader.get("playwright.headless", "true"));
                     
                     // Define arguments to maximize the browser window
                     List<String> args = Arrays.asList("--start-maximized");
                     
-                    browser = playwright.chromium().launch(
-                        new BrowserType.LaunchOptions()
-                            .setChannel(browserChannel)
+                    BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions()
                             .setSlowMo(slowMoValue)
                             .setHeadless(isHeadless)
-                            .setArgs(args) // <-- Add this to maximize the window
-                    );
+                            .setArgs(args);
+                    
+                    // Only apply setChannel if a specific channel is explicitly requested in config
+                    if (!browserChannel.isEmpty()) 
+					{
+                        launchOptions.setChannel(browserChannel);
+                    }
+                    
+                    browser = playwright.chromium().launch(launchOptions);
                 }
             }
         }
 
-        // Initialize Thread-Local Context and Page for THIS specific test thread
+        // Initialize Thread-Local Context and Page for this specific test thread
         if (page.get() == null) 
         {
             // Set viewport to null so the context takes the full size of the maximized window
             BrowserContext newContext = browser.newContext(new Browser.NewContextOptions().setViewportSize(null));
             
             context.set(newContext);
-            
+			
             page.set(newContext.newPage());
         }
         
@@ -66,7 +74,7 @@ public class PlaywrightManager
 
     public static void closeBrowser() 
     {
-        // Close ONLY the resources belonging to the current thread
+        // Close only the resources belonging to the current thread
         if (page.get() != null) 
         {
             page.get().close();
