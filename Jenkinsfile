@@ -73,7 +73,153 @@ pipeline
             echo 'Pipeline failed. Check the console output and archived reports.'
         }
     }
+	
+/*
+Legitimate uses of script { }:
+------------------------------
+Use the script { } block inside a Declarative Jenkins Pipeline whenever you need to run Scripted Pipeline (Groovy) logic that the standard Declarative syntax does not support.
+Declarative Pipelines are meant to be simple and structured, so they intentionally restrict complex programming constructs. Adding a script block inside a steps section acts as an "escape hatch" for advanced logic.
+	
+Legitimate uses of `script { }' block inside a Declarative Jenkins Pipeline:
+
+1. Variables that need to be computed at runtime
+
+```groovy
+steps 
+{
+    script 
+	{
+        def branch = env.BRANCH_NAME.toLowerCase()
+        def tag = branch.replaceAll('/', '-')
+        env.IMAGE_TAG = "${tag}-${env.BUILD_NUMBER}"
+    }
     
-    // Use the script { } block inside a Declarative Jenkins Pipeline whenever you need to run Scripted Pipeline (Groovy) logic that the standard Declarative syntax does not support.
-    // Declarative Pipelines are meant to be simple and structured, so they intentionally restrict complex programming constructs. Adding a script block inside a steps section acts as an "escape hatch" for advanced logic.
+	bat "docker build -t myapp:${env.IMAGE_TAG} ."
+}
+```
+
+You can't do `def x = ...` directly inside `steps { }` — you need `script { }`.
+
+
+2. `if / else` or `try / catch` around steps
+
+Declarative has `when { }` for stage-level conditions, but for in-step branching you need `script`:
+
+```groovy
+steps 
+{
+    script 
+	{
+        if (env.BRANCH_NAME == 'main') 
+		{
+            bat 'mvn deploy'
+        } 
+		else 
+		{
+            bat 'mvn verify'
+        }
+    }
+}
+```
+
+```groovy
+steps 
+{
+    script 
+	{
+        try 
+		{
+            bat 'mvn test'
+        } 
+		catch (Exception e) 
+		{
+            echo "Tests failed: ${e.message}"
+            currentBuild.result = 'UNSTABLE'
+        }
+    }
+}
+```
+
+3. Loops over dynamic lists
+
+```groovy
+steps 
+{
+    script 
+	{
+        def browsers = ['chromium', 'firefox', 'webkit']
+        
+		for (b in browsers) 
+		{
+            bat "mvn exec:java -D exec.args=\"install ${b}\""
+        }
+    }
+}
+```
+
+Declarative has no `for` loop. You either use `script { }` or a `matrix { }` (which is often cleaner for this exact case).
+
+4. Looping over a file / parsing output
+
+```groovy
+steps 
+{
+    script 
+	{
+        def failed = bat(returnStdout: true, script: 'type failures.txt').trim()failed.split('\n')
+		.each { line ->
+            echo "FAILED: ${line}"
+        }
+    }
+}
+```
+
+5. `parallel` with dynamically generated branches
+
+```groovy
+steps 
+{
+    script 
+	{
+        def branches = [:]
+        ['smoke', 'regression'].each { suite ->
+            branches[suite] = { bat "mvn test -Dsuite=${suite}" }
+        }
+        parallel branches
+    }
+}
+```
+
+(For static branches, Declarative's `parallel { }` stage is preferred.)
+
+6. Defining helper functions / closures
+
+```groovy
+steps 
+{
+    script 
+	{
+        def runSuite = { name ->
+            bat "mvn test -Dsuite=${name}"
+        }
+        runSuite('smoke')
+        runSuite('regression')
+    }
+}
+```
+
+7. Accessing `currentBuild` properties programmatically
+
+```groovy
+steps 
+{
+    script 
+	{
+        currentBuild.description = "Branch: ${env.BRANCH_NAME}"
+        currentBuild.result = 'SUCCESS'
+    }
+}
+```
+*/	
+	
 }
