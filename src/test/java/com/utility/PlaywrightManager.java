@@ -26,25 +26,19 @@ public class PlaywrightManager
 			// The synchronized keyword in Java is a thread-safety modifier that ensures only one thread can execute a specific method or block of code at a time. 
         	// The synchronized keyword in Java prevents race conditions and memory consistency errors when multiple threads access shared data simultaneously.
         	// The synchronized block
-            synchronized (PlaywrightManager.class)   
+        	synchronized (PlaywrightManager.class)   
             {
                 if (playwright == null) 
                 {
                     playwright = Playwright.create();
                     
-                    // Default to empty string to use Playwright's bundled Chromium.
-                    // If you want to use a specific browser (e.g., "chrome", "msedge") locally, 
-                    // set browser.name=chrome in your config file AND ensure it's installed on that machine.
-                    
-                    // String browserChannel = ConfigReader.get("browser.name", "").trim();
+                    // FIX: Check System properties first (for Jenkins -D flags), 
+                    // then fallback to ConfigReader, then default to EMPTY STRING (bundled Chromium).
                     String browserChannel = System.getProperty("browser.name", ConfigReader.get("browser.name", "")).trim();
                     
+                    int slowMoValue = Integer.parseInt(System.getProperty("playwright.slowmo", ConfigReader.get("playwright.slowmo", "0"))); 
                     
-                    // int slowMoValue = Integer.parseInt(ConfigReader.get("playwright.slowmo", "0")); 
-                    int slowMoValue = Integer.parseInt(System.getProperty("playwright.slowmo", ConfigReader.get("playwright.slowmo", "0")));
-                    
-                    // boolean isHeadless = Boolean.parseBoolean(ConfigReader.get("playwright.headless", "true"));
-                    boolean isHeadless = Boolean.parseBoolean(System.getProperty("playwright.headless", ConfigReader.get("playwright.headless", "true")));   // <-- now -D works
+                    boolean isHeadless = Boolean.parseBoolean(System.getProperty("playwright.headless", ConfigReader.get("playwright.headless", "true")));
                     
                     // Define arguments to maximize the browser window
                     List<String> args = Arrays.asList("--start-maximized");
@@ -54,9 +48,10 @@ public class PlaywrightManager
                             .setHeadless(isHeadless)
                             .setArgs(args);
                     
-                    // Only apply setChannel if a specific channel is explicitly requested in config
+                    // ONLY set channel if a specific browser is explicitly requested (e.g., local dev)
+                    // If empty, Playwright automatically uses the bundled Chromium we installed in Jenkins.
                     if (!browserChannel.isEmpty()) 
-					{
+                    {
                         launchOptions.setChannel(browserChannel);
                     }
                     
