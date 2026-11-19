@@ -34,7 +34,10 @@ public class PlaywrightManager
                     
                     // FIX: Check System properties first (for Jenkins -D flags), 
                     // then fallback to ConfigReader, then default to EMPTY STRING (bundled Chromium).
-                    String browserChannel = System.getProperty("browser.name", ConfigReader.get("browser.name", "")).trim();
+                    // Browser channel is overridable ONLY via -Dbrowser.name (local: -Dbrowser.name=chrome).
+                    // In Jenkins we pass nothing -> empty -> Playwright uses the bundled Chromium from
+                    // ${WORKSPACE}/.playwright-browsers. The config file can no longer poison CI.
+                    String browserChannel = System.getProperty("browser.name", "").trim();	
                     
                     int slowMoValue = Integer.parseInt(System.getProperty("playwright.slowmo", ConfigReader.get("playwright.slowmo", "0"))); 
                     
