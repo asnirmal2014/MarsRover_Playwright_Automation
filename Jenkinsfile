@@ -29,7 +29,7 @@ pipeline
 		{
             steps 
 			{
-                // cleanWs()   // Optional: Only add if you're debugging. Wipes workspace and the browser cache
+                cleanWs()   // Optional: Only add if you're debugging. Wipes workspace and the browser cache
 				echo 'Checking out latest code from Git repository'
                 checkout scm
             }
