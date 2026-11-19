@@ -40,7 +40,15 @@ pipeline
             steps 
 			{
                 echo 'Installing Playwright bundled Chromium...'
-                bat 'mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install chromium"'
+                // FIX B: exec:java runs the CLI in the Maven JVM; lingering daemon threads /
+                // the inherited stdout pipe can keep the bat step alive forever, so the global
+                // timeout never fires. cleanupDaemonThreads=false lets the JVM exit and the pipe close.
+                bat 'mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install chromium" -Dexec.cleanupDaemonThreads=false'
+
+                // Stronger fallback if the hang persists: run the CLI in a SEPARATE JVM that
+                // exits cleanly (no daemon-thread / pipe inheritance at all). Swap the line
+                // above for this one to test it:
+                // bat 'mvn exec:exec -Dexec.executable=java -Dexec.args="-cp %classpath com.microsoft.playwright.CLI install chromium"'
             }
         }
 
