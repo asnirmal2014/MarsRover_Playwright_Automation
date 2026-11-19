@@ -18,9 +18,16 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.release>21</maven.compiler.release>
         
+        <!--
         <browser.name>chrome</browser.name>
         <playwright.slowmo>1000</playwright.slowmo>
-        <playwright.headless>false</playwright.headless> <!-- Default for local -->
+        <playwright.headless>false</playwright.headless> 
+        -->
+        
+        <!-- CI-SAFE DEFAULTS: Empty channel uses bundled Chromium, headless=true, slowmo=0 -->
+        <browser.name></browser.name>
+        <playwright.slowmo>0</playwright.slowmo>
+        <playwright.headless>true</playwright.headless>
         
         <!-- Centralized Version Properties -->
         <!--<cucumber.version>7.34.2</cucumber.version>-->
@@ -228,6 +235,7 @@
 			        	<threadCount>4</threadCount>
 			        		
 	                    <!-- THIS IS THE CRUCIAL ADDITION: Forward -D flags to the test JVM -->
+	                    <!-- Passing these properties to the test JVM -->
 	                    <systemPropertyVariables>
 	                        <project.basedir>${project.basedir}</project.basedir>
 	                        <playwright.headless>${playwright.headless}</playwright.headless>
