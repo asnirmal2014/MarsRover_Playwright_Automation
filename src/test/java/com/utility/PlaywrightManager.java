@@ -35,8 +35,9 @@ public class PlaywrightManager
                     
                     // Read from System property first (for local dev: -Dbrowser.name=chrome).
                     // Fall back to config file, but default to EMPTY STRING so Jenkins always uses bundled Chromium.
-                    String browserChannel = System.getProperty("browser.name", ConfigReader.get("browser.name", "")).trim();
+                    // String browserChannel = System.getProperty("browser.name", ConfigReader.get("browser.name", "")).trim();
                     
+                    String browserChannel = System.getProperty("browser.name", "").trim();
                     int slowMoValue = Integer.parseInt(System.getProperty("playwright.slowmo", "0")); 
                     boolean isHeadless = Boolean.parseBoolean(System.getProperty("playwright.headless", "true"));
                     
