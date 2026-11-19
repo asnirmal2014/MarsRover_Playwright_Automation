@@ -35,9 +35,16 @@ public class PlaywrightManager
                     // Default to empty string to use Playwright's bundled Chromium.
                     // If you want to use a specific browser (e.g., "chrome", "msedge") locally, 
                     // set browser.name=chrome in your config file AND ensure it's installed on that machine.
-                    String browserChannel = ConfigReader.get("browser.name", "").trim();
-                    int slowMoValue = Integer.parseInt(ConfigReader.get("playwright.slowmo", "0")); 
-                    boolean isHeadless = Boolean.parseBoolean(ConfigReader.get("playwright.headless", "true"));
+                    
+                    // String browserChannel = ConfigReader.get("browser.name", "").trim();
+                    String browserChannel = System.getProperty("browser.name", ConfigReader.get("browser.name", "")).trim();
+                    
+                    
+                    // int slowMoValue = Integer.parseInt(ConfigReader.get("playwright.slowmo", "0")); 
+                    int slowMoValue = Integer.parseInt(System.getProperty("playwright.slowmo", ConfigReader.get("playwright.slowmo", "0")));
+                    
+                    // boolean isHeadless = Boolean.parseBoolean(ConfigReader.get("playwright.headless", "true"));
+                    boolean isHeadless = Boolean.parseBoolean(System.getProperty("playwright.headless", ConfigReader.get("playwright.headless", "true")));   // <-- now -D works
                     
                     // Define arguments to maximize the browser window
                     List<String> args = Arrays.asList("--start-maximized");
