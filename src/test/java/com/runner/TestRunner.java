@@ -22,9 +22,25 @@ public class TestRunner
 	
 	/*
 	    To see the output visually (Not Headless) in the 'chrome' browser:
-	    In the STS IDE:
-		Right Click 'TestRunner.java' -> Run As -> Maven build... -> Goals: 
-		mvn clean test -Dbrowser.name=chrome -Dplaywright.headless=false -Dplaywright.slowmo=1000 
+	     
+	    In the Spring Tool Suite (STS) IDE:
+        Open your project explorer.
+        Right Click 'TestRunner.java' -> Run As -> Maven build... -> Goals:
+        clean test -Dbrowser.name=chrome -Dplaywright.headless=false -Dplaywright.slowmo=1000
+        Click 'Save'.
+        Click 'Run'.
+
+        [ OR ]
+
+        In the Spring Tool Suite (STS) IDE:
+        Open your project explorer.
+        Right Click 'TestRunner.java' -> Run As -> Run Configurations...
+        The values are:
+        Name: MarsRover Playwright - Run Tests - Chrome (Visual + SlowMo)
+        Base directory: ${project_loc:MarsRover_Playwright_Automation}
+        Goals: clean test -Dbrowser.name=chrome -Dplaywright.headless=false -Dplaywright.slowmo=1000
+        Click 'Save'.
+        Click 'Run'.
 	*/
 }
 
