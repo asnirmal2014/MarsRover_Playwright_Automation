@@ -44,5 +44,5 @@ Method 2: Saved Run Configuration (Recommended for frequent use)
    - Goals: `clean test -Dbrowser.name=chrome -Dplaywright.headless=false -Dplaywright.slowmo=1000`
 4. Click Apply, then click Run.
 
-Tip: 
+Tip:
 The `-Dplaywright.slowmo=1000` flag adds a 1-second delay between actions, making it much easier to visually verify that locators are interacting with the correct elements.
