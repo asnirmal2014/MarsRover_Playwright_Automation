@@ -28,19 +28,6 @@ public class PlaywrightManager
                 {
                     playwright = Playwright.create();
                     
-                    // NUCLEAR OPTION: Hardcoded to empty string. 
-                    // This GUARANTEES Playwright uses the bundled Chromium we installed in Jenkins.
-                    // It completely ignores config.properties and system properties for the channel.
-                    // String browserChannel = ""; 
-                    
-                    // Read from System property first (for local dev: -Dbrowser.name=chrome).
-                    // Fall back to config file, but default to EMPTY STRING so Jenkins always uses bundled Chromium.
-                    // String browserChannel = System.getProperty("browser.name", ConfigReader.get("browser.name", "")).trim();
-                    // String browserChannel = System.getProperty("browser.name", "").trim();
-                    
-                    // FORCE empty string, ignoring ALL config files and system properties for the channel
-                    // String browserChannel = ""; 
-                    
                     // Read from System property (set by Maven pom.xml or Jenkins -D flags).
                     // Defaults to empty string, which tells Playwright to use bundled Chromium.
                     String browserChannel = System.getProperty("browser.name", "").trim();
