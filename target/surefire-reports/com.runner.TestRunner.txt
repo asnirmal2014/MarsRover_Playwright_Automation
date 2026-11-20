@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: com.runner.TestRunner
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 31.15 s <<< FAILURE! -- in com.runner.TestRunner
-NASA Mars Weather API Testing.NASA Mars Weather API Testing - Verify GET request to InSight Mars Weather API -- Time elapsed: 5.516 s <<< FAILURE!
+Tests run: 4, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 11.65 s <<< FAILURE! -- in com.runner.TestRunner
+NASA Mars Weather API Testing.NASA Mars Weather API Testing - Verify GET request to InSight Mars Weather API -- Time elapsed: 4.179 s <<< FAILURE!
 java.lang.AssertionError: 
 1 expectation failed.
 Expected status code <200> but was <429>.
