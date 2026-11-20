@@ -14,3 +14,4 @@ Feature: Mars Rover Movement
     And I send the commands "LMLMLMLMM"
     And I click the Execute button
     Then the final position should be "1 3 N"
+    

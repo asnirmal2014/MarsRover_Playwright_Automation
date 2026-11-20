@@ -64,3 +64,4 @@ public class Hooks
         // (If your manager doesn't have this, you can skip this step and just ignore the warning)
     }
 }
+

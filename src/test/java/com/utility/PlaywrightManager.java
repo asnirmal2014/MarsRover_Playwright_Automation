@@ -97,3 +97,4 @@ public class PlaywrightManager
         System.out.println("Playwright shut down cleanly.");
     }
 }
+

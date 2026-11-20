@@ -10,3 +10,4 @@ Feature: NASA Mars Weather API Testing
     When I send a GET request to "/insight_weather/?api_key=DEMO_KEY&feedtype=json&ver=1.0"
     Then the response status code should be 200
     And the response body should contain "AT"
+    

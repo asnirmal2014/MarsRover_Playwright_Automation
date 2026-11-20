@@ -20,3 +20,4 @@ Feature: Multiple Rovers Navigation
     And I send the commands "MMRMMRMRRM"
     And I click the Execute button
     Then the final position should be "5 1 E"
+    
