@@ -1,0 +1,8 @@
+# Force GitHub to count Java and Gherkin files
+# Ensure Java and Gherkin are always detected
+*.java linguist-detectable=true
+*.feature linguist-detectable=true
+
+# Tell GitHub to ignore index.html for language statistics
+# Keep index.html in the repo, but reduce its weight in language stats
+index.html linguist-detectable=false
