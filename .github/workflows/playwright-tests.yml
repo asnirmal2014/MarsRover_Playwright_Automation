@@ -41,18 +41,27 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/pom.xml') }}
 
       # 5. Install Playwright's Chromium browser and dependencies
-      # Installs the Chromium browser and the Linux system libraries (fonts, graphics
-      # drivers) Chromium needs to run headless. This does NOT affect Maven flags;
-      # headless mode is driven by your Maven test step / ConfigReader.java.
+	  # It is a shell command on the runner to invoke Playwright's installer and also installs Linux system libraries (fonts, graphics drivers) which Chromium needs to run headless.
+      # This does NOT affect Maven flags; headless mode is driven by your Maven test step / ConfigReader.java.
       - name: Install Playwright's Chromium browser and dependencies
         run: npx playwright install --with-deps chromium
 
       # 6. Run the Maven Tests (Parallel execution will happen automatically based on pom.xml)
+	  # clean removes previous build output, typically under target/.
+	  # test runs the tests configured in your Maven project.
+	  # -Dplaywright.headless=true sets a Java system property named playwright.headless to true. 
+	  # Your test/configuration code must read this property for it to affect browser behavior.
       - name: Run Playwright & Cucumber Tests
         run: mvn clean test -Dplaywright.headless=true
 
       # 7. Upload Cucumber HTML Report as an artifact (so you can view it after the run)
-      # Because the Linux machine is destroyed immediately after the test finishes, this step zips up your target/cucumber/report.html and saves it as an "Artifact" in GitHub. You can click and download it to see the pretty green report, even if the tests failed.
+	  # Uploads a file from the runner so you can download it from the workflow run.
+	  # Because the Linux machine is destroyed immediately after the test finishes, this step zips up your target/cucumber/report.html and saves it as an "Artifact" in GitHub. 
+	  # You can click and download it to see the pretty green report, even if the tests failed.
+	  # if: always() - Asks GitHub to run this step even if an earlier step failed.
+	  # name: Is the artifact’s name in GitHub Actions.
+	  # path: Is the report file to upload.
+	  # retention-days: 7  Keeps the artifact for seven days.
       - name: Upload Cucumber Report
         uses: actions/upload-artifact@v4
         if: always() # Upload even if tests fail
