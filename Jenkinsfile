@@ -1,3 +1,5 @@
+// Jenkinsfile connects GitHub to Jenkins so that every time you push code from Git to GitHub, the GitHub automatically "pokes" Jenkins to start this pipeline file.
+
 pipeline 
 {
     agent 
