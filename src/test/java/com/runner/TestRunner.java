@@ -19,7 +19,6 @@ import org.junit.platform.suite.api.Suite;
 public class TestRunner 
 {
     // Empty – JUnit Platform Suite will pick up the annotations
-
 	
 	/*
 	    To see the output visually (Not Headless) in the 'chrome' browser:
