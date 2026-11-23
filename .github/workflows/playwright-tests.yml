@@ -1,4 +1,4 @@
-# This is a 'GitHub Actions workflow file' which is automatically get triggered after a successful push to GitHub from Git. (playwright-tests.yml)
+# This is a 'GitHub Actions workflow file' which is automatically get triggered after a successful push code to GitHub from Git. (playwright-tests.yml)
 # It tells GitHub how to set up a Linux machine, install the tools your project needs, run your Playwright/Cucumber tests.
 # Then save the test report.
 
