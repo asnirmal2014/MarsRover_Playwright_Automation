@@ -1,3 +1,7 @@
+# This is a GitHub Actions workflow.
+# It tells GitHub how to set up a Linux machine, install the tools your project needs, run your Playwright/Cucumber tests.
+# Then save the test report.
+
 name: Mars Rover Automation CI
 
 on:
@@ -9,7 +13,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
       # 1. Checkout the code (Downloads your code from GitHub to the Linux machine)
       - name: Checkout Repository
@@ -36,9 +40,11 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/pom.xml') }}
 
-      # 5. Install Playwright dependencies (Chrome, etc.) (Runs npx playwright install --with-deps chromium. This downloads Chrome and the hidden Linux system libraries (like fonts and graphics drivers) that Chrome needs to run on Linux)
-      # It passes the -D flag to Maven. Your updated 'ConfigReader.java' catches this flag, overrides the false in your 'config.properties', and launches Chrome invisibly, preventing the "Missing X server" crash.
-      - name: Install Playwright Browsers
+      # 5. Install Playwright's Chromium browser and dependencies
+      # Installs the Chromium browser and the Linux system libraries (fonts, graphics
+      # drivers) Chromium needs to run headless. This does NOT affect Maven flags;
+      # headless mode is driven by your Maven test step / ConfigReader.java.
+      - name: Install Playwright's Chromium browser and dependencies
         run: npx playwright install --with-deps chromium
 
       # 6. Run the Maven Tests (Parallel execution will happen automatically based on pom.xml)
@@ -54,3 +60,4 @@ jobs:
           name: cucumber-html-report
           path: target/cucumber/report.html
           retention-days: 7
+		  
